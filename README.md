@@ -1,69 +1,33 @@
-# React + TypeScript + Vite
+# 👖 Pattern Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web-based tool that lets fashion designers (starting with me, building my clothing brand SEVR) upload fabric patterns and preview them on 3D garments.
 
-Currently, two official plugins are available:
+## 🚀 Why I’m Building This
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+I’m starting a clothing brand, and one of the hardest parts of working with manufacturers is visualizing how a fabric pattern will actually look on a finished garment.
 
-## Expanding the ESLint configuration
+Instead of sending 2D swatches back and forth, this project lets me:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Upload a pattern (cheetah print, tropical print, etc.)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Apply it to a garment model (pants for now)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Adjust scaling/repeating
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Share previews with manufacturers or collaborators
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+It’s also a way to combine my tech background with my passion for fashion and design.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🔧 Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Frontend: React, TypeScript, TailwindCSS
+
+3D Rendering: Three.js + React Three Fiber + Drei
+
+Planned Backend: Node.js + Express + PostgreSQL (for auth, file storage, and user libraries)
+
+## 🛠️ Current Features (MVP)
+
+✅ Render pants model in 3D
+✅ Apply different fabric patterns (Cheetah, Tropical, etc.)
+✅ Real-time texture swapping with controls
