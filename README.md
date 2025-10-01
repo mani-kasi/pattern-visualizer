@@ -25,9 +25,3 @@ Frontend: React, TypeScript, TailwindCSS
 3D Rendering: Three.js + React Three Fiber + Drei
 
 Planned Backend: Node.js + Express + PostgreSQL (for auth, file storage, and user libraries)
-
-## 🛠️ Current Features (MVP)
-
-✅ Render pants model in 3D
-✅ Apply different fabric patterns (Cheetah, Tropical, etc.)
-✅ Real-time texture swapping with controls
