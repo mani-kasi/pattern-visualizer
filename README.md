@@ -27,3 +27,13 @@ Instead of sending 2D swatches back and forth, this project lets me:
 More features coming soon. lighting controls, hue & saturation sliders, and multiple garment types.
 
 Enjoy experimenting with new fabrics and extending the garment library! 🎨
+
+## 🖼️ Preview
+<p align="center">
+  <img src="./public/preview/login-preview.png" width="800" />
+</p>
+
+<p align="center">
+  <img src="./public/preview/visualizer-preview.png" width="800" />
+</p>
+
