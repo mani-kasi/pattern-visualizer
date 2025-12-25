@@ -9,6 +9,8 @@ import { API_BASE_URL } from '../constants/api'
 import { clearAuthToken, getAuthToken } from '../constants/auth'
 
 const DEFAULT_SCALE = 1
+const PANTS_PATCH_NAME_HINTS = ['object_9']
+const PANTS_PATCH_ACTION: 'hide' | 'neutral-material' = 'hide'
 
 const BUILT_IN_PATTERNS: PatternOption[] = [
   { id: 'none', name: 'No Pattern', file: null },
@@ -41,19 +43,40 @@ function PantsModel({ texture, onLoaded }: PantsModelProps) {
     return mat
   }, [texture])
 
+  const neutralMaterial = useMemo(() => {
+    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color('#b3b3b3') })
+    mat.needsUpdate = true
+    return mat
+  }, [])
+
   useEffect(() => () => material.dispose(), [material])
+  useEffect(() => () => neutralMaterial.dispose(), [neutralMaterial])
 
   useEffect(() => {
     pantsScene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh
-        mesh.material = material
+        const meshName = mesh.name.toLowerCase()
+        const materialNames = Array.isArray(mesh.material)
+          ? mesh.material.map((mat) => mat.name?.toLowerCase() ?? '')
+          : [((mesh.material as THREE.Material | undefined)?.name ?? '').toLowerCase()]
+        const matchesNameHint = PANTS_PATCH_NAME_HINTS.some((hint) => meshName.includes(hint))
+
+        if (matchesNameHint) {
+          if (PANTS_PATCH_ACTION === 'hide') {
+            mesh.visible = false
+          } else {
+            mesh.material = neutralMaterial
+          }
+        } else {
+          mesh.material = material
+        }
         mesh.castShadow = true
         mesh.receiveShadow = true
       }
     })
     onLoaded?.()
-  }, [material, onLoaded, pantsScene])
+  }, [material, neutralMaterial, onLoaded, pantsScene])
 
   return <primitive object={pantsScene} />
 }
