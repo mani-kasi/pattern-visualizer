@@ -10,10 +10,7 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "react-router-dom": ["./src/lib/react-router-dom"]
-    }
+    "baseUrl": "."
   },
   "include": ["src"]
 }

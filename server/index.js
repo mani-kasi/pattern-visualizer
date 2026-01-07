@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
+const crypto = require('crypto');
 
 dotenv.config();
 
@@ -74,6 +75,37 @@ function authenticateToken(req, res, next) {
     req.user = user;
     next();
   });
+}
+
+function buildShareUrl(req, slug) {
+  return `${req.protocol}://${req.get('host')}/s/${slug}`;
+}
+
+function mapPresetRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    patternId: row.pattern_id,
+    settings: row.settings,
+    isPublic: row.is_public,
+    shareSlug: row.share_slug,
+    createdAt: row.created_at,
+  };
+}
+
+async function generateUniqueShareSlug() {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const slug = crypto.randomBytes(6).toString('hex').slice(0, 10);
+    const exists = await pool.query('SELECT 1 FROM presets WHERE share_slug = $1', [slug]);
+    if (exists.rows.length === 0) {
+      return slug;
+    }
+  }
+  throw new Error('Failed to generate a unique share slug.');
+}
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 app.post('/api/auth/signup', async (req, res) => {
@@ -174,6 +206,144 @@ app.get('/api/patterns', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Fetch patterns error:', error);
     res.status(500).json({ message: 'Failed to fetch patterns.' });
+  }
+});
+
+app.post('/api/presets', authenticateToken, async (req, res) => {
+  const { name, patternId, settings } = req.body;
+
+  if (!isNonEmptyString(name) || !isNonEmptyString(patternId) || !settings || typeof settings !== 'object' || Array.isArray(settings)) {
+    return res.status(400).json({ message: 'Preset name, patternId, and settings are required.' });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO presets (user_id, name, pattern_id, settings) VALUES ($1, $2, $3, $4) RETURNING *',
+      [req.user.userId, name.trim(), patternId, settings]
+    );
+    res.status(201).json(mapPresetRow(result.rows[0]));
+  } catch (error) {
+    console.error('Create preset error:', error);
+    res.status(500).json({ message: 'Failed to save preset.' });
+  }
+});
+
+app.get('/api/presets', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM presets WHERE user_id = $1 ORDER BY created_at DESC',
+      [req.user.userId]
+    );
+    res.json(result.rows.map(mapPresetRow));
+  } catch (error) {
+    console.error('Fetch presets error:', error);
+    res.status(500).json({ message: 'Failed to fetch presets.' });
+  }
+});
+
+app.get('/api/presets/:id', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM presets WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Preset not found.' });
+    }
+    res.json(mapPresetRow(result.rows[0]));
+  } catch (error) {
+    console.error('Fetch preset error:', error);
+    res.status(500).json({ message: 'Failed to fetch preset.' });
+  }
+});
+
+app.delete('/api/presets/:id', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'DELETE FROM presets WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.userId]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Preset not found.' });
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Delete preset error:', error);
+    res.status(500).json({ message: 'Failed to delete preset.' });
+  }
+});
+
+app.post('/api/presets/:id/share', authenticateToken, async (req, res) => {
+  try {
+    const existing = await pool.query(
+      'SELECT share_slug FROM presets WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.userId]
+    );
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ message: 'Preset not found.' });
+    }
+
+    const shareSlug = existing.rows[0].share_slug || (await generateUniqueShareSlug());
+    const updated = await pool.query(
+      'UPDATE presets SET is_public = true, share_slug = $1 WHERE id = $2 AND user_id = $3 RETURNING share_slug',
+      [shareSlug, req.params.id, req.user.userId]
+    );
+
+    res.json({ shareSlug: updated.rows[0].share_slug, shareUrl: buildShareUrl(req, shareSlug) });
+  } catch (error) {
+    console.error('Share preset error:', error);
+    res.status(500).json({ message: 'Failed to share preset.' });
+  }
+});
+
+app.post('/api/presets/:id/unshare', authenticateToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'UPDATE presets SET is_public = false WHERE id = $1 AND user_id = $2',
+      [req.params.id, req.user.userId]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Preset not found.' });
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Unshare preset error:', error);
+    res.status(500).json({ message: 'Failed to unshare preset.' });
+  }
+});
+
+app.get('/api/share/:slug', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT name, pattern_id, settings, is_public FROM presets WHERE share_slug = $1',
+      [req.params.slug]
+    );
+    if (result.rows.length === 0 || !result.rows[0].is_public) {
+      return res.status(404).json({ message: 'Shared preset not found.' });
+    }
+
+    const preset = result.rows[0];
+    let patternUrl = null;
+
+    if (typeof preset.pattern_id === 'string' && preset.pattern_id.startsWith('remote-')) {
+      const patternId = Number(preset.pattern_id.replace('remote-', ''));
+      if (!Number.isNaN(patternId)) {
+        const patternResult = await pool.query('SELECT filename FROM patterns WHERE id = $1', [patternId]);
+        if (patternResult.rows.length > 0) {
+          patternUrl = `${req.protocol}://${req.get('host')}/uploads/${patternResult.rows[0].filename}`;
+        }
+      }
+    }
+
+    res.json({
+      name: preset.name,
+      patternId: preset.pattern_id,
+      settings: preset.settings,
+      patternUrl,
+    });
+  } catch (error) {
+    console.error('Fetch shared preset error:', error);
+    res.status(500).json({ message: 'Failed to fetch shared preset.' });
   }
 });
 

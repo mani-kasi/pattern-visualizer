@@ -1,10 +1,11 @@
 .app {
   display: flex;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   background: #fff9f3;
   color: #1a1a1a;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -16,6 +17,8 @@
   flex-direction: column;
   gap: 24px;
   box-sizing: border-box;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .sidebar-top {
@@ -44,10 +47,43 @@
   gap: 12px;
 }
 
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #92400e;
+}
+
+.toggle-row input {
+  accent-color: #f97316;
+}
+
 .pattern-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.pattern-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pattern-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pattern-scroll::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.5);
+  border-radius: 999px;
+}
+
+.pattern-scroll::-webkit-scrollbar-track {
+  background: rgba(249, 115, 22, 0.12);
+  border-radius: 999px;
 }
 
 .button {
@@ -143,17 +179,332 @@
   accent-color: #f97316;
 }
 
+.presets-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.presets-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.preset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preset-input {
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #fcd34d;
+  font-size: 0.9rem;
+  background: #fff7ed;
+  color: #78350f;
+}
+
+.preset-input:focus {
+  outline: 2px solid rgba(249, 115, 22, 0.35);
+  outline-offset: 2px;
+}
+
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preset-card {
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff7ed;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preset-card__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.preset-card__name {
+  font-weight: 600;
+  color: #92400e;
+  font-size: 0.95rem;
+}
+
+.preset-card__meta {
+  font-size: 0.75rem;
+  color: #b45309;
+}
+
+.preset-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-action {
+  border: 1px solid #fcd34d;
+  background: #ffffff;
+  color: #92400e;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.preset-action:hover:not(:disabled) {
+  background: #ffedd5;
+  border-color: #fb923c;
+}
+
+.preset-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.preset-card__share {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.preset-share-input {
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid #fcd34d;
+  background: #ffffff;
+  font-size: 0.75rem;
+  color: #78350f;
+}
+
+.studio-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.studio-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.studio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.studio-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.studio-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.studio-selected {
+  font-size: 0.8rem;
+  color: #b45309;
+}
+
 .viewer {
   flex: 1;
   min-height: 0;
   display: flex;
   position: relative;
+  overflow: hidden;
 }
 
 .canvas-wrapper {
   flex: 1;
   position: relative;
   min-height: 0;
+}
+
+.share-banner {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 10px 12px;
+  z-index: 2;
+  box-shadow: 0 10px 24px rgba(120, 53, 15, 0.15);
+  backdrop-filter: blur(6px);
+}
+
+.share-banner__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.share-banner__subtitle {
+  font-size: 0.75rem;
+  color: #b45309;
+}
+
+.share-banner--error {
+  top: auto;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  text-align: center;
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: rgba(254, 242, 242, 0.95);
+}
+
+.share-banner--loading {
+  top: auto;
+  bottom: 16px;
+  left: 16px;
+}
+
+.hud-stack {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 2;
+}
+
+.studio-hud {
+  width: 260px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(120, 53, 15, 0.15);
+  padding: 12px;
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+.studio-hud__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.studio-hud__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.studio-hud__toggle {
+  border: 1px solid #fcd34d;
+  background: #fff7ed;
+  color: #92400e;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.studio-hud__toggle:hover {
+  background: #ffedd5;
+  border-color: #fb923c;
+}
+
+.studio-hud__body {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.studio-hud:not(.studio-hud--open) {
+  padding-bottom: 8px;
+}
+
+.studio-hud .pattern-button {
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.studio-hud .studio-selected {
+  font-size: 0.75rem;
+}
+
+.preset-hud {
+  width: 260px;
+  max-height: calc(100% - 64px);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(120, 53, 15, 0.15);
+  padding: 12px;
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.preset-hud__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.preset-hud__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.preset-hud__body {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.preset-hud .preset-list {
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.preset-hud .preset-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.preset-hud .preset-list::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.5);
+  border-radius: 999px;
+}
+
+.preset-hud .preset-list::-webkit-scrollbar-track {
+  background: rgba(249, 115, 22, 0.12);
+  border-radius: 999px;
 }
 
 .canvas-loading {

@@ -1,5 +1,5 @@
-import { FormEvent, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { API_BASE_URL } from '../constants/api'
 import { getIsAuthenticated, setAuthToken } from '../constants/auth'
@@ -9,17 +9,23 @@ type AuthMode = 'login' | 'signup'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [mode, setMode] = useState<AuthMode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const redirectPath = useMemo(() => {
+    const state = location.state as { from?: { pathname?: string } } | null
+    return state?.from?.pathname || '/app'
+  }, [location.state])
+
   useEffect(() => {
     if (getIsAuthenticated()) {
-      navigate('/app', { replace: true })
+      navigate(redirectPath, { replace: true })
     }
-  }, [navigate])
+  }, [navigate, redirectPath])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -61,7 +67,7 @@ export default function LoginPage() {
       }
 
       setAuthToken(loginData.token)
-      navigate('/app', { replace: true })
+      navigate(redirectPath, { replace: true })
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : 'Unexpected authentication error.')
     } finally {
