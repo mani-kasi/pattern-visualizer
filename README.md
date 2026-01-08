@@ -1,39 +1,65 @@
 # Pattern Visualizer
 A 3D full-stack web app I built to test and visualize fabric patterns for my clothing brand **SEVR**.
-It lets users upload patterns, preview them on a pair of pants, and adjust the scale in real time.
-Built with React, Three.js, Node, and Supabase.
+It lets users upload patterns, preview them on a pants model, tweak scale + lighting in real time, and export/share consistent previews before ordering samples.
+
+
+## Demo
+Demo video:
+
 
 ## Features
-- Secure signup/login flow backed by a Node.js + Express API with JWT auth.
-- Pattern library with built-in swatches plus user uploads stored on disk and indexed in PostgreSQL.
-- Real-time scaling for seamless textures on the 3D pants model.
-- Export the live canvas to a PNG image.
-- Logout control and inline status messages for uploads, syncs, and model loading.
+- Auth: signup/login backed by a Node.js and Express API with JWT
+- Pattern library: built-in default swatches + user uploads (indexed in Postgres)
+- 3D preview: real-time seamless texture scaling on a GLB pants model
+- Studio mode: lighting presets (Studio Soft / Flat / Dramatic) and optional grid/axes helpers
+- Export: save the live canvas to PNG (supports transparent background)
+- Presets: save/load/delete presets and generate public share links (/s/:slug)
+
 
 ## Tech Stack
-- **Frontend:** React, TypeScript, Vite, Tailwind reset, React Three Fiber, Drei
+- **Frontend:** React, TypeScript, Vite, React Three Fiber, Drei
 - **Backend:** Node.js, Express, PostgreSQL (Supabase), Multer, JWT, bcrypt
 - **3D Assets:** GLB pants model rendered with Three.js
 
-## Why I’m Building This
-I’m starting a clothing brand, and one of the hardest parts of working with manufacturers is visualizing how a fabric pattern will actually look on a finished garment.
 
-Instead of sending 2D swatches back and forth, this project lets me:
-- Upload a pattern (cheetah print, tropical print, etc.).
-- Apply it to a garment model.
-- Adjust scaling/repeating.
-- Share previews with manufacturers or collaborators.
+## Why I built this
+I’m starting a clothing brand and when working with clothing samples, it’s hard to predict how a pattern will look like on an actual garment from a 2D mockup, especially under real lighting. Instead of repeatedly microadjusting the pattern's size and colour, wasting money and time on new samples, this tool helps me iterate faster on pattern scale, contrast, and the overall “feel” before sending decisions to manufacturing.
 
-More features coming soon. lighting controls, hue & saturation sliders, and multiple garment types.
 
-Enjoy experimenting with new fabrics and extending the garment library!
+## How to Run Locally
+You need a Postgres database and two terminals.
 
-## Preview
-<p align="center">
-  <img src="./public/preview/login-preview.png" width="800" />
-</p>
+### 1) Backend API
+```bash
+cd server
+npm install
+```
 
-<p align="center">
-  <img src="./public/preview/visualizer-preview.png" width="800" />
-</p>
+Create `server/.env` with:
+```
+DATABASE_URL=postgres://USER:PASSWORD@HOST:PORT/DATABASE
+JWT_SECRET=your-dev-secret
+```
 
+Run the SQL migration in Supabase SQL editor:
+- server/sql/001_create_presets.sql
+
+Start the API:
+```bash
+npm run dev
+```
+
+API runs on `http://localhost:4000` by default.
+
+### 2) Frontend
+```bash
+cd ..
+npm install
+npm run dev
+```
+
+Frontend runs on `http://localhost:5173`.
+
+### Notes
+- If you change the backend port, update src/constants/api.ts.
+- CORS in server/index.js allows only http://localhost:5173 by default.
