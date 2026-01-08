@@ -1,6 +1,6 @@
 # Pattern Visualizer
-A 3D full-stack web app I built to test and visualize fabric patterns for my clothing brand **SEVR**.
-It lets users upload patterns, preview them on a pants model, tweak scale + lighting in real time, and export/share consistent previews before ordering samples.
+A 3D full-stack web app I built to test and visualize fabric patterns for my clothing brand, **SEVR**.
+It lets users upload patterns, preview them on a pants model, tweak scale and lighting in real time, and export/share consistent previews before ordering samples.
 
 
 ## Demo
