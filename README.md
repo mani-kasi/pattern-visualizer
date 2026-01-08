@@ -7,8 +7,6 @@ It lets users upload patterns, preview them on a pants model, tweak scale and li
 https://github.com/user-attachments/assets/372d0436-85fe-4059-972d-30060d73dba9
 
 
-
-
 ## Features
 - Auth: signup/login backed by a Node.js and Express API with JWT
 - Pattern library: built-in default swatches + user uploads (indexed in Postgres)
@@ -24,7 +22,7 @@ https://github.com/user-attachments/assets/372d0436-85fe-4059-972d-30060d73dba9
 - **3D Assets:** GLB pants model rendered with Three.js
 
 
-## Why I built this
+## Why I Built This
 I’m starting a clothing brand and when working with clothing samples, it’s hard to predict how a pattern will look like on an actual garment from a 2D mockup, especially under real lighting. Instead of repeatedly microadjusting the pattern's size and colour, wasting money and time on new samples, this tool helps me iterate faster on pattern scale, contrast, and the overall “feel” before sending decisions to manufacturing.
 
 
