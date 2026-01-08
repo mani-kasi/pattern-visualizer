@@ -4,7 +4,9 @@ It lets users upload patterns, preview them on a pants model, tweak scale + ligh
 
 
 ## Demo
-Demo video:
+https://github.com/user-attachments/assets/372d0436-85fe-4059-972d-30060d73dba9
+
+
 
 
 ## Features
